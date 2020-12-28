@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles/main.css">
+    <title>Leur</title>
+</head>
+<body>
+<noscript>JS ein, du Pfosten!</noscript>
+<script src="https://l3p3.de/shr/lui.dev.js"></script>
+<script>
+    const {node_dom, node, node_list, hook_state, hook_first, init} = lui;
+
+    const storeDayEvents = (eventList, year, month, day) => (
+        window.localStorage.setItem(`${year}-${month}-${day}`, JSON.stringify(eventList))
+    );
+    const getDayEvents = (year, month, day) => (window.localStorage.getItem(`${year}-${month}-${day}`));
+
+    const months = [
+        {id: 0, name: 'Januar', days: 31, type: 'WINTER'},
+        {id: 1, name: 'Februar', days: 29, type: 'WINTER'},
+        {id: 2, name: 'März', days: 30, type: 'WINTER'},
+        {id: 3, name: 'April', days: 31, type: 'SPRING'},
+        {id: 4, name: 'Mai', days: 30, type: 'SPRING'},
+        {id: 5, name: 'Juni', days: 31, type: 'SUMMER'},
+        {id: 6, name: 'Juli', days: 30, type: 'SUMMER'},
+        {id: 7, name: 'August', days: 31, type: 'SUMMER'},
+        {id: 8, name: 'September', days: 30, type: 'AUTUMN'},
+        {id: 9, name: 'Oktober', days: 31, type: 'AUTUMN'},
+        {id: 10, name: 'November', days: 30, type: 'AUTUMN'},
+        {id: 11, name: 'Dezember', days: 31, type: 'WINTER'},
+    ]
+
+    const Cal = ({month, year}) => {
+        let cellData = [];
+        for (let i = 0; i < months[month].days; i++) {
+            if (month === 1 && i === 28 && (year % 4 !== 0)) break;
+            else cellData.push({id: i, month: months[month].id, year});
+        }
+        return [
+            node_dom('div[className=cal__cells]', null, [node_list(CalCell, cellData)])
+        ];
+    }
+
+    const CalCell = ({I}) => {
+        const [calEvents, setEvents] = hook_state([]);
+        const [editMode, setEditMode] = hook_state(false);
+        if (hook_first()) setEvents(JSON.parse(getDayEvents(I.year, I.month, I.id)) || [])
+        return [
+            node_dom('div[className=cal-cell]', {
+                innerText: I.id + 1,
+                onclick: () => (setEditMode(true))
+            }, [
+                editMode ? node(CalEventDetails, {
+                    calEvent: {label: "Neues Ereignis", time: "00:00", loc: "Ort", desc: "Beschreibung"},
+                    eventSetter: setEvents,
+                    editModeSetter: setEditMode
+                }) : null,
+                calEvents ? node_list(CalEvent, calEvents) : null
+            ])
+        ]
+    }
+
+    const NavBarTop = ({activeMonth, activeYear, changeMonth, changeYear}) => {
+        const [switchActive, setSwitchActive] = hook_state(false);
+        return [
+            node_dom('header[className=navbar-top]', {
+                onmouseleave: () => setSwitchActive(false)
+            }, [
+                node_dom('h1[className=navbar-top__heading][innerText=Kalender]'),
+                node_dom('div[className=navbar-top__switch]', null, [
+                    switchActive ? node_dom('button[innerText=Up]', {
+                        onclick: () => {
+                            changeMonth(months[activeMonth.id < 11 ? activeMonth.id + 1 : 0]);
+                            if (activeMonth.id === 11) changeYear(activeYear + 1)
+                        }
+                    }) : null,
+                    node_dom('h2[className=navbar-top__month]', {
+                        innerText: `${activeMonth.name} - ${activeYear}`,
+                        onmouseover: () => setSwitchActive(true),
+                    }),
+                    switchActive ? node_dom('button[innerText=Down]', {
+                        onclick: () => {
+                            changeMonth(months[activeMonth.id > 0 ? activeMonth.id - 1 : 11]);
+                            if (activeMonth.id === 0) changeYear(activeYear - 1)
+                        }
+                    }) : null
+                ]),
+                node_dom('div[className=navbar-top__days cal__cells]', null, [
+                    ...['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'].map(day => (
+                        node_dom('span[className=navbar-top__days__day]', {innerText: day}))
+                    )
+                ])
+            ])
+        ]
+    }
+
+    const CalEventDetails = ({calEvent, eventSetter, editModeSetter, addNew = true}) => ([
+        node_dom('div[className=cal-event__edit]', {onmouseleave: () => editModeSetter(false)}, [
+            node_dom('h1[className=cal-event__title]', {innerText: calEvent.label}),
+            node_dom('span[className=cal-event__title--sub]', {innerText: calEvent.loc}),
+            node_dom('span[className=cal-event__time]', {innerText: calEvent.time}),
+            node_dom('p[className=cal-event__desc]', {innerText: calEvent.desc}),
+            node_dom('button[className=button button--primary]', {
+                innerText: addNew ? "Speichern" : "Ändern",
+                onclick: () => {
+                    editModeSetter(false);
+                    eventSetter([{id: new Date().getTime(), ...calEvent}]);
+                }
+            })
+        ])
+    ])
+
+    // loc, time, label, desc
+    const CalEvent = ({I}) => {
+        const [editMode, setEditMode] = hook_state(false);
+        const [calEventDetails, setDetails] = hook_state(I);
+        return [
+            node_dom('div[className=cal-event]', {
+                S: {'background-color': I.color || '#5cc9f5'},
+                onclick: () => setEditMode(!editMode)
+            }, [
+                node_dom('span[className=cal-event__label]', {innerText: I.label}),
+                node_dom('span[className=cal-event__time]', {innerText: I.time}),
+                editMode ? node(CalEventDetails, {
+                    calEvent: calEventDetails, eventSetter: setDetails, editModeSetter: setEditMode, addNew: false
+                }) : null
+            ])
+        ]
+    }
+
+    init(() => {
+            const [activeMonth, changeMonth] = hook_state(months[0]);
+            const [activeYear, changeYear] = hook_state(2020);
+            return [null, [
+                node_dom('div[id=cal][className=cal]', null, [
+                    node(NavBarTop, {activeMonth, activeYear, changeMonth, changeYear}),
+                    node(Cal, {month: activeMonth.id, year: activeYear})
+                ])
+            ]]
+        }
+    )
+
+</script>
+</body>
+</html>

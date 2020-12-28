@@ -1,0 +1,9 @@
+# IDEs and Editors
+/.idea
+/.vscode
+
+# macOS
+.DS_Store
+
+# packages
+/node_modules

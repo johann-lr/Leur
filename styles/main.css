@@ -1,0 +1,48 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.cal-event {
+    display: flex;
+    z-index: 4;
+    justify-content: space-between;
+    padding: .125rem .35rem;
+    margin: .25rem;
+    border-radius: .3rem;
+}
+
+.cal-event__edit {
+    width: 18rem;
+    height: 26rem;
+    position: absolute;
+    background-color: #fff;
+    z-index: 5;
+    border-radius: .4rem;
+    box-shadow: 1px 1px #ddd;
+    border: 1px solid #ddd;
+}
+
+.cal-cell {
+    height: 10rem;
+    border: 1px solid #0f0f0f;
+}
+
+.cal__cells {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+@media (max-width: 750px) {
+    .cal__cells {
+        grid-template-columns: 1fr;
+    }
+}
+
+.navbar-top__switch {
+    display: flex;
+}
+.navbar-top__switch button {
+    border: none;
+    background: none;
+}
