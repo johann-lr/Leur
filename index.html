@@ -3,19 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
     <title>Leur</title>
 </head>
 <body>
 <noscript>JS ein, du Pfosten!</noscript>
 <script src="https://l3p3.de/shr/lui.dev.js"></script>
 <script>
-    const {node_dom, node, node_list, hook_state, hook_first, init} = lui;
+    // Lui library import
+    const {
+        node_dom,
+        node,
+        node_map,
+        hook_state,
+        hook_first,
+        hook_static,
+        hook_rerender,
+        hook_effect,
+        hook_reducer,
+        init
+    } = lui;
 
+    // helper
     const storeDayEvents = (eventList, year, month, day) => (
         window.localStorage.setItem(`${year}-${month}-${day}`, JSON.stringify(eventList))
     );
-    const getDayEvents = (year, month, day) => (window.localStorage.getItem(`${year}-${month}-${day}`));
+    const getDayEvents = (year, month, day) => window.localStorage.getItem(`${year}-${month}-${day}`);
 
+    // types for state reducers
+    const REDUCER_TYPES = {
+        // Calendar events for a calendar cell
+        CAL_EVENT_INIT: 0,
+        CAL_EVENT_LOAD: 1,
+        CAL_EVENT_ADD: 2,
+        CAL_EVENT_MOD: 3,
+        CAL_EVENT_RM: 4
+    };
+
+    // Reducers
+    const calEventsReducer = [
+        // INIT
+        () => [],
+        // LOAD (localstorage)
+        (state, {year, month, day}) => (JSON.parse(getDayEvents(year, month, day)) || []),
+        // ADD
+        (state, payload) => state.concat(payload),
+        // MODIFY
+        (state, payload) => {
+            const itemIndex = state.findIndex(el => el.id === payload.id)
+            state[itemIndex] = payload
+            return state
+        },
+        // REMOVE
+        (state, payload) => state.filter(item => item.id !== payload)
+    ];
+
+    // data -> move to json
     const months = [
         {id: 0, name: 'Januar', days: 31, type: 'WINTER'},
         {id: 1, name: 'Februar', days: 29, type: 'WINTER'},
@@ -31,6 +74,8 @@
         {id: 11, name: 'Dezember', days: 31, type: 'WINTER'},
     ]
 
+    // Components
+
     const Cal = ({month, year}) => {
         let cellData = [];
         for (let i = 0; i < months[month].days; i++) {
@@ -38,25 +83,34 @@
             else cellData.push({id: i, month: months[month].id, year});
         }
         return [
-            node_dom('div[className=cal__cells]', null, [node_list(CalCell, cellData)])
+            node_dom('div[className=cal__cells]', null, [node_map(CalCell, cellData, {month})])
         ];
     }
 
-    const CalCell = ({I}) => {
-        const [calEvents, setEvents] = hook_state([]);
+    const CalCell = ({I, month}) => {
+        const [calEvents, eventMutations] = hook_reducer(calEventsReducer);
         const [editMode, setEditMode] = hook_state(false);
-        if (hook_first()) setEvents(JSON.parse(getDayEvents(I.year, I.month, I.id)) || [])
+        if (hook_first()) eventMutations(REDUCER_TYPES.CAL_EVENT_INIT);
+        hook_effect(m => {
+            eventMutations(REDUCER_TYPES.CAL_EVENT_LOAD, {year: I.year, month: m, day: I.id})
+        }, [month])
+        hook_effect(updatedEvents => {
+            if (I !== undefined && month !== undefined && updatedEvents.length)
+                storeDayEvents(updatedEvents, I.year, month, I.id)
+        }, [calEvents]);
         return [
             node_dom('div[className=cal-cell]', {
                 innerText: I.id + 1,
-                onclick: () => (setEditMode(true))
+                onclick: (event) => {
+                    if (event.target.className.includes('cal-cell')) setEditMode(true)
+                }
             }, [
                 editMode ? node(CalEventDetails, {
                     calEvent: {label: "Neues Ereignis", time: "00:00", loc: "Ort", desc: "Beschreibung"},
-                    eventSetter: setEvents,
+                    eventMutations,
                     editModeSetter: setEditMode
                 }) : null,
-                calEvents ? node_list(CalEvent, calEvents) : null
+                calEvents ? node_map(CalEvent, calEvents, {eventMutations}) : null
             ])
         ]
     }
@@ -69,20 +123,20 @@
             }, [
                 node_dom('h1[className=navbar-top__heading][innerText=Kalender]'),
                 node_dom('div[className=navbar-top__switch]', null, [
-                    switchActive ? node_dom('button[innerText=Up]', {
+                    switchActive ? node_dom('button[innerText=<]', {
                         onclick: () => {
-                            changeMonth(months[activeMonth.id < 11 ? activeMonth.id + 1 : 0]);
-                            if (activeMonth.id === 11) changeYear(activeYear + 1)
+                            changeMonth(months[activeMonth.id > 0 ? activeMonth.id - 1 : 11]);
+                            if (activeMonth.id === 0) changeYear(activeYear - 1)
                         }
                     }) : null,
                     node_dom('h2[className=navbar-top__month]', {
                         innerText: `${activeMonth.name} - ${activeYear}`,
                         onmouseover: () => setSwitchActive(true),
                     }),
-                    switchActive ? node_dom('button[innerText=Down]', {
+                    switchActive ? node_dom('button[innerText=>]', {
                         onclick: () => {
-                            changeMonth(months[activeMonth.id > 0 ? activeMonth.id - 1 : 11]);
-                            if (activeMonth.id === 0) changeYear(activeYear - 1)
+                            changeMonth(months[activeMonth.id < 11 ? activeMonth.id + 1 : 0]);
+                            if (activeMonth.id === 11) changeYear(activeYear + 1)
                         }
                     }) : null
                 ]),
@@ -95,49 +149,81 @@
         ]
     }
 
-    const CalEventDetails = ({calEvent, eventSetter, editModeSetter, addNew = true}) => ([
-        node_dom('div[className=cal-event__edit]', {onmouseleave: () => editModeSetter(false)}, [
-            node_dom('h1[className=cal-event__title]', {innerText: calEvent.label}),
-            node_dom('span[className=cal-event__title--sub]', {innerText: calEvent.loc}),
-            node_dom('span[className=cal-event__time]', {innerText: calEvent.time}),
-            node_dom('p[className=cal-event__desc]', {innerText: calEvent.desc}),
-            node_dom('button[className=button button--primary]', {
-                innerText: addNew ? "Speichern" : "Ändern",
-                onclick: () => {
-                    editModeSetter(false);
-                    eventSetter([{id: new Date().getTime(), ...calEvent}]);
-                }
-            })
-        ])
-    ])
+    const CalEventDetails = ({calEvent, eventMutations, editModeSetter, addNew = true}) => {
+        return [
+            node_dom('div[className=cal-event__edit]', null, [
+                node_dom('button[className=cal-event__close button button--small][innerText=x]', {onclick: () => editModeSetter(false)}),
+                node_dom('input[className=cal-event__title]', {
+                    onchange: (event) => (calEvent.label = event.target.value),
+                    placeholder: calEvent.label
+                }),
+                node_dom('input[className=cal-event__title--sub]', {
+                    onchange: (event) => (calEvent.loc = event.target.value),
+                    placeholder: calEvent.loc
+                }),
+                node_dom('input[className=cal-event__inputtime input input--time][type=time]', {
+                    onchange: (event) => (calEvent.time = event.target.value),
+                }),
+                node_dom('textarea[className=cal-event__desc input input--text][max=200]', {
+                    onchange: (event) => (calEvent.desc = event.target),
+                    placeholder: calEvent.desc
+                }),
+                node_dom('input[className=cal-event__color input input--color][type=color]', {
+                    onchange: (event) => (calEvent.color = event.target.value)
+                }),
+                !addNew ? node_dom('button[className=button button--sec][innerText=Löschen]', {
+                    onclick: () => {
+                        editModeSetter(false);
+                        eventMutations(REDUCER_TYPES.CAL_EVENT_RM, calEvent.id);
+                    }
+                }) : null,
+                node_dom('button[className=button button--primary]', {
+                    innerText: addNew ? "Speichern" : "Ändern",
+                    onclick: () => {
+                        editModeSetter(false);
+                        eventMutations(REDUCER_TYPES[addNew ? 'CAL_EVENT_ADD' : 'CAL_EVENT_MOD'], {
+                            ...(addNew ? {id: new Date().getTime()} : {}),
+                            ...calEvent
+                        })
+                    }
+                })
+            ])
+        ]
+    }
 
     // loc, time, label, desc
-    const CalEvent = ({I}) => {
+    const CalEvent = ({I, eventMutations}) => {
         const [editMode, setEditMode] = hook_state(false);
-        const [calEventDetails, setDetails] = hook_state(I);
         return [
             node_dom('div[className=cal-event]', {
                 S: {'background-color': I.color || '#5cc9f5'},
-                onclick: () => setEditMode(!editMode)
+                onclick: (event) => {
+                    if (event.target.className === 'cal-event') setEditMode(!editMode)
+                }
             }, [
                 node_dom('span[className=cal-event__label]', {innerText: I.label}),
                 node_dom('span[className=cal-event__time]', {innerText: I.time}),
                 editMode ? node(CalEventDetails, {
-                    calEvent: calEventDetails, eventSetter: setDetails, editModeSetter: setEditMode, addNew: false
+                    calEvent: I, eventMutations, editModeSetter: setEditMode, addNew: false
                 }) : null
             ])
         ]
     }
 
+    // App root
     init(() => {
             const [activeMonth, changeMonth] = hook_state(months[0]);
             const [activeYear, changeYear] = hook_state(2020);
-            return [null, [
-                node_dom('div[id=cal][className=cal]', null, [
-                    node(NavBarTop, {activeMonth, activeYear, changeMonth, changeYear}),
-                    node(Cal, {month: activeMonth.id, year: activeYear})
-                ])
-            ]]
+            return (!window.localStorage || !window.sessionStorage)
+                ? [null, [node_dom('div[innerText=Diese Anwendung ist nicht mit einem Toaster Kompatibel]', null, [
+                    node_dom('p[innerText=>:-|]')
+                ])]]
+                : [null, [
+                    node_dom('div[id=cal][className=cal]', null, [
+                        node(NavBarTop, {activeMonth, activeYear, changeMonth, changeYear}),
+                        node(Cal, {month: activeMonth.id, year: activeYear})
+                    ])
+                ]]
         }
     )
 
