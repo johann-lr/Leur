@@ -1,6 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Ubuntu:wght@300&display=swap');
+
+
+:root {
+    --spacer: 1rem;
+    --primary-color: green;
+    --secondary-color: red;
+    --gray: #ddd;
+    --font-family--heading: OpenSans, sans-serif;
+    --font-family-main: Ubuntu, sans-serif;
+    --padding--default: 2rem;
+}
+
 body {
     margin: 0;
-    padding: 0;
+    padding: var(--spacer);
+    font-family: var(--font-family-main);
 }
 
 .cal-event {
@@ -12,6 +26,27 @@ body {
     border-radius: .3rem;
 }
 
+.cal-event__title {
+
+}
+.cal-event__title--sub {
+
+}
+.cal-event__desc {
+
+}
+.cal-event__color {
+
+}
+.cal-event__time {
+
+}
+.cal-event__head {
+    display: flex;
+    justify-content: end;
+    width: 100%;
+    height: 2rem;
+}
 .cal-event__edit {
     width: 18rem;
     height: 26rem;
@@ -37,12 +72,69 @@ body {
     .cal__cells {
         grid-template-columns: 1fr;
     }
+    .navbar-top__days {
+        display: none;
+    }
+    .cal-event__edit {
+        width: 90%;
+        height: 90%;
+        position: fixed;
+        top: 5%;
+    }
 }
 
+.navbar-top {
+}
+h1, .h1, .navbar-top__heading {
+    font-family: var(--font-family--heading);
+}
+.navbar-top__month {
+}
+.navbar-top__days {
+
+}
 .navbar-top__switch {
     display: flex;
+    min-width: 150px;
+    margin: 0 var(--spacer);
 }
 .navbar-top__switch button {
     border: none;
     background: none;
+}
+button, .button {
+    border: none;
+}
+.button--primary {
+    background-color: var(--primary-color);
+    padding: .5rem var(--spacer);
+    margin: .25rem;
+}
+.button--sec {
+    background-color: var(--secondary-color);
+    padding: .5rem var(--spacer);
+    margin: .25rem;
+}
+input, .input {
+    border: none;
+    outline: none;
+    height: 2.5rem;
+    width: 100%;
+    font-size: inherit;
+    font-family: var(--font-family-main);
+}
+.input--color {
+
+}
+.input--time {
+
+}
+.input--text {
+
+}
+.flex {
+    display: flex;
+}
+.space-between {
+    justify-content: space-between;
 }
