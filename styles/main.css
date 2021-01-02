@@ -3,12 +3,13 @@
 
 :root {
     --spacer: 1rem;
-    --primary-color: green;
-    --secondary-color: red;
+    --primary-color: #4af2a1;
+    --secondary-color: #d5e5dd;
     --gray: #ddd;
     --font-family--heading: OpenSans, sans-serif;
     --font-family-main: Ubuntu, sans-serif;
     --padding--default: 2rem;
+    --border-radius: .3rem;
 }
 
 body {
@@ -51,9 +52,13 @@ body {
     width: 18rem;
     height: 26rem;
     position: absolute;
+    padding: var(--spacer);
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
     background-color: #fff;
     z-index: 5;
-    border-radius: .4rem;
+    border-radius: var(--border-radius);
     box-shadow: 1px 1px #ddd;
     border: 1px solid #ddd;
 }
@@ -104,6 +109,9 @@ h1, .h1, .navbar-top__heading {
 }
 button, .button {
     border: none;
+    border-radius: var(--border-radius);
+    font-family: inherit;
+    background: none;
 }
 .button--primary {
     background-color: var(--primary-color);
@@ -124,7 +132,9 @@ input, .input {
     font-family: var(--font-family-main);
 }
 .input--color {
-
+    width: 2.5rem;
+    height: 2rem;
+    border-radius: var(--border-radius);
 }
 .input--time {
 

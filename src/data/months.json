@@ -1,0 +1,74 @@
+[
+  {
+    "id": 0,
+    "name": "Januar",
+    "days": 31,
+    "type": "WINTER"
+  },
+  {
+    "id": 1,
+    "name": "Februar",
+    "days": 29,
+    "type": "WINTER"
+  },
+  {
+    "id": 2,
+    "name": "März",
+    "days": 30,
+    "type": "WINTER"
+  },
+  {
+    "id": 3,
+    "name": "April",
+    "days": 31,
+    "type": "SPRING"
+  },
+  {
+    "id": 4,
+    "name": "Mai",
+    "days": 30,
+    "type": "SPRING"
+  },
+  {
+    "id": 5,
+    "name": "Juni",
+    "days": 31,
+    "type": "SUMMER"
+  },
+  {
+    "id": 6,
+    "name": "Juli",
+    "days": 30,
+    "type": "SUMMER"
+  },
+  {
+    "id": 7,
+    "name": "August",
+    "days": 31,
+    "type": "SUMMER"
+  },
+  {
+    "id": 8,
+    "name": "September",
+    "days": 30,
+    "type": "AUTUMN"
+  },
+  {
+    "id": 9,
+    "name": "Oktober",
+    "days": 31,
+    "type": "AUTUMN"
+  },
+  {
+    "id": 10,
+    "name": "November",
+    "days": 30,
+    "type": "AUTUMN"
+  },
+  {
+    "id": 11,
+    "name": "Dezember",
+    "days": 31,
+    "type": "WINTER"
+  }
+]
