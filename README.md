@@ -1,6 +1,6 @@
 # Leur
 
-A basic calendar web application to test and demonstrate lui.
+A basic calendar web application to test and demonstrate lui. (in development)
 
 ## Build & Installation
 
