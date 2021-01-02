@@ -1,7 +1,15 @@
-import {node_dom} from 'lui/src/lui'
-import {CAL_EVENT_RM, CAL_EVENT_ADD, CAL_EVENT_MOD} from "../reducers/types/EventReducerTypes"
+import { node_dom, node } from 'lui/src/lui'
+import { CAL_EVENT_RM, CAL_EVENT_ADD, CAL_EVENT_MOD } from "../reducers/types/EventReducerTypes"
 
-export const CalEventDetails = ({calEvent, eventMutations, editModeSetter, addNew = true}) => ([
+/**
+ * Window to edit or create CalEvents
+ * @param calEvent the CalEvent data (from parent)
+ * @param eventMutations
+ * @param editModeSetter to hide the window again
+ * @param addNew If false, the window's intention is the modification of an existing CalEvent
+ * @constructor
+ */
+export const CalEventDetails = ({calEvent, eventMutations, editModeSetter, addNew = true}): node => ([
     node_dom('div[className=cal-event__edit]', null, [
         node_dom('button[className=cal-event__head flex space-between]', null, [
             node_dom('input[className=cal-event__color input input--color][type=color]', {

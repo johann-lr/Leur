@@ -1,8 +1,8 @@
-import {getDayEvents} from '../helpers'
+import { getDayEvents } from '../helpers'
 
 export default [
     // INIT
-    () => [],
+    (): [] => [],
     // LOAD (localstorage)
     // @ts-ignore
     (state, {year, month, day}) => (JSON.parse(getDayEvents(year, month, day)) || []),

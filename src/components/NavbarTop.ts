@@ -1,8 +1,16 @@
-import {hook_state as state, node_dom} from 'lui/src/lui'
+import { hook_state, node_dom, node } from 'lui/src/lui'
 import months from '../data/months.json'
 
-export const NavBarTop = ({activeMonth, activeYear, changeMonth, changeYear}) => {
-    const [switchActive, setSwitchActive] = state(false);
+/**
+ * Single-use-component: The application's navigation bar
+ * @param activeMonth
+ * @param activeYear
+ * @param changeMonth month-setter
+ * @param changeYear year-setter
+ * @constructor
+ */
+export const NavBarTop = ({activeMonth, activeYear, changeMonth, changeYear}): node => {
+    const [switchActive, setSwitchActive]: [boolean, (newVal: boolean) => void] = hook_state(false);
     return [
         node_dom('header[className=navbar-top]', {
             onmouseleave: () => setSwitchActive(false)
