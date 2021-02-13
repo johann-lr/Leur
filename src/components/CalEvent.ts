@@ -1,4 +1,4 @@
-import { hook_state, node_dom, node } from 'lui/src/lui'
+import {hook_state, node_dom, node, LuiNode} from 'lui'
 import { CalEventDetails } from "./CalEventDetails"
 
 /**
@@ -7,7 +7,7 @@ import { CalEventDetails } from "./CalEventDetails"
  * @param eventMutations
  * @constructor
  */
-export const CalEvent = ({I, eventMutations}): node => {
+export const CalEvent = ({I, eventMutations}): LuiNode => {
     const [editMode, setEditMode]: [boolean, (newVal: boolean) => void] = hook_state(false);
     return [
         node_dom('div[className=cal-event]', {

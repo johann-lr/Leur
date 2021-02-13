@@ -6,7 +6,7 @@
  */
 
 import { NavBarTop } from "./components/NavbarTop"
-import { init, hook_state, node, node_dom } from 'lui/src/lui'
+import { init, hook_state, node, node_dom } from 'lui'
 import months from './data/months.json'
 import { Cal } from "./components/Cal"
 import { Month } from "./types"

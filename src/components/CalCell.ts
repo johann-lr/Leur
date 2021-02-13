@@ -1,4 +1,4 @@
-import { node, node_dom, node_map, hook_reducer, hook_state, hook_first, hook_effect } from 'lui/src/lui'
+import {node, node_dom, node_map, hook_reducer, hook_state, hook_first, hook_effect, LuiNode} from 'lui'
 import { storeDayEvents } from '../helpers'
 import calEventsReducer from '../reducers/EventReducer'
 import { CAL_EVENT_INIT, CAL_EVENT_LOAD } from '../reducers/types/EventReducerTypes'
@@ -12,7 +12,7 @@ import { Month } from "../types"
  * @param month passed by activeMonth from the parent state
  * @constructor
  */
-export const CalCell = ({I, month}): node => {
+export const CalCell = ({I, month}): LuiNode => {
     const [calEvents, eventMutations]: [any[], (actionType: number, payload?: any) => void] = hook_reducer(calEventsReducer);
     const [editMode, setEditMode]: [boolean, (newVal: boolean) => void] = hook_state(false);
     if (hook_first()) eventMutations(CAL_EVENT_INIT);

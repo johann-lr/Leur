@@ -1,4 +1,4 @@
-import { hook_state, node_dom, node } from 'lui/src/lui'
+import {hook_state, node_dom, node, LuiNode} from 'lui'
 import months from '../data/months.json'
 
 /**
@@ -9,7 +9,7 @@ import months from '../data/months.json'
  * @param changeYear year-setter
  * @constructor
  */
-export const NavBarTop = ({activeMonth, activeYear, changeMonth, changeYear}): node => {
+export const NavBarTop = ({activeMonth, activeYear, changeMonth, changeYear}): LuiNode => {
     const [switchActive, setSwitchActive]: [boolean, (newVal: boolean) => void] = hook_state(false);
     return [
         node_dom('header[className=navbar-top]', {
