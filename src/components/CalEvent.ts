@@ -1,19 +1,18 @@
-import {hook_state, node_dom, node, LuiNode} from 'lui'
+import {hook_state, node_dom, node, LuiNodeList} from 'lui'
 import { CalEventDetails } from "./CalEventDetails"
 
 /**
  * An event for a calendar's cell
  * @param I including loc (location), time, label, desc (description)
  * @param eventMutations
- * @constructor
  */
-export const CalEvent = ({I, eventMutations}): LuiNode => {
-    const [editMode, setEditMode]: [boolean, (newVal: boolean) => void] = hook_state(false);
+export const CalEvent = ({I, eventMutations}): LuiNodeList => {
+    const [editMode, setEditMode] = hook_state(false);
     return [
         node_dom('div[className=cal-event]', {
-            S: {'background-color': I.color || '#5cc9f5'},
+            S: {'backgroundColor': I.color || '#5cc9f5'},
             onclick: (event) => {
-                if (event.target.className === 'cal-event') setEditMode(!editMode)
+                if ((event.target as Element).className === 'cal-event') setEditMode(!editMode)
             }
         }, [
             node_dom('span[className=cal-event__label]', {innerText: I.label}),

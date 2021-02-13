@@ -12,9 +12,9 @@ import { Cal } from "./components/Cal"
 import { Month } from "./types"
 
 init(() => {
-        const [activeMonth, changeMonth]: [Month, (newMonth: Month) => void] = hook_state(months[0]);
-        const [activeYear, changeYear]: [number, (newYear: number) => void] = hook_state(2020);
-        return (!window.localStorage || !window.sessionStorage)
+        const [activeMonth, changeMonth] = hook_state(months[0]);
+        const [activeYear, changeYear] = hook_state(2020);
+        return (!window.localStorage)
             ? [null, [node_dom('div[innerText=Diese Anwendung ist nicht mit einem Toaster Kompatibel]', null, [
                 node_dom('p[innerText=>:-|]')
             ])]]

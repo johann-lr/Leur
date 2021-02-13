@@ -1,4 +1,4 @@
-import {node, node_dom, node_map, hook_reducer, hook_state, hook_first, hook_effect, LuiNode} from 'lui'
+import {node, node_dom, node_map, hook_reducer, hook_state, hook_first, hook_effect, LuiNodeList} from 'lui'
 import { storeDayEvents } from '../helpers'
 import calEventsReducer from '../reducers/EventReducer'
 import { CAL_EVENT_INIT, CAL_EVENT_LOAD } from '../reducers/types/EventReducerTypes'
@@ -10,12 +10,12 @@ import { Month } from "../types"
  * A single cell for the calendar grid
  * @param I passed by node_map in Cal component
  * @param month passed by activeMonth from the parent state
- * @constructor
  */
-export const CalCell = ({I, month}): LuiNode => {
-    const [calEvents, eventMutations]: [any[], (actionType: number, payload?: any) => void] = hook_reducer(calEventsReducer);
-    const [editMode, setEditMode]: [boolean, (newVal: boolean) => void] = hook_state(false);
-    if (hook_first()) eventMutations(CAL_EVENT_INIT);
+export const CalCell = ({I, month}): LuiNodeList => {
+    const [calEvents, eventMutations] = hook_reducer(calEventsReducer);
+    const [editMode, setEditMode] = hook_state(false);
+    // @ts-ignore
+    if (hook_first()) eventMutations(CAL_EVENT_INIT, null);
     hook_effect((m: Month) => eventMutations(CAL_EVENT_LOAD, {year: I.year, month: m, day: I.id}), [month]);
     hook_effect((updatedEvents : any[]) => {
         if (I !== undefined && month !== undefined && updatedEvents.length)
@@ -25,7 +25,7 @@ export const CalCell = ({I, month}): LuiNode => {
         node_dom('div[className=cal-cell]', {
             innerText: I.id + 1,
             onclick: (event) => {
-                if (event.target.className.includes('cal-cell')) setEditMode(true)
+                if ((event.target as Element).className.includes('cal-cell')) setEditMode(true)
             },
             onkeydown: (event) => {
                 if (event.code === 'Escape') setEditMode(false);
