@@ -2,17 +2,22 @@ const path = require("path");
 
 module.exports = {
     entry: "./src/app.ts",
+    mode: "development",
     output: {
         filename: "build.js",
         path: path.resolve(__dirname, 'dist')
     },
     resolve: {
-        extensions: [".ts", ".js"]
+        modules: [__dirname, 'node_modules'],
+        extensions: [".ts", ".js"],
+        fallback: {
+            "path": require.resolve('path-browserify')
+        }
     },
     module: {
         rules: [
             {
-                test: /\.(ts|tsx)?$/,
+                test: /\.(js|ts)?$/,
                 use: {
                     loader: "ts-loader"
                 },
