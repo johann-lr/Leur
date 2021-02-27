@@ -12,7 +12,9 @@ export const CalEventDetails = ({calEvent, eventMutations, editModeSetter, addNe
     node_dom('div[className=cal-event__edit]', null, [
         node_dom('button[className=cal-event__head flex space-between]', null, [
             node_dom('input[className=cal-event__color input input--color][type=color]', {
-                onchange: (event) => (calEvent.color = (event.target as HTMLInputElement).value)
+                onchange: (event) => (calEvent.color = (event.target as HTMLInputElement).value),
+                // @ts-ignore
+                value: calEvent.color
             }),
             node_dom('button[className=cal-event__close button button--small icon-cross]', {
                 onclick: () => editModeSetter(false)
